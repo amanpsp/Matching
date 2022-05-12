@@ -38,6 +38,15 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: BG
+    uniqueID: 950531633
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Gem
+    uniqueID: 2045328023
+    locked: 0
+  - name: Effect
+    uniqueID: 4222916547
     locked: 0
