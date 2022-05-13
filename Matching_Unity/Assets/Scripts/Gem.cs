@@ -64,6 +64,29 @@ public class Gem : MonoBehaviour
         col.gameObject.transform.position = originalGemVectorPos;
         col.gameObject.GetComponent<Gem>().originalGemVectorPos = originalGemVectorPos;
         originalGemVectorPos = newGemVectorPos;
+        SwapGemPosIndex(col.GetComponent<Gem>());
+        SwapBoardIndex(col.GetComponent<Gem>());
+        SwapGemNames(col.GetComponent<Gem>());
+        //Debug.Log(board.allGems[posIndex.x, posIndex.y].GetComponent<Gem>().posIndex.x + " "+ board.allGems[posIndex.x, posIndex.y].GetComponent<Gem>().posIndex.y );
         }
+    }
+
+    private void SwapBoardIndex(Gem otherGem){
+        board.allGems[otherGem.posIndex.x, otherGem.posIndex.y] = this;
+        board.allGems[posIndex.x, posIndex.y] = otherGem;
+
+    }
+
+    private void SwapGemPosIndex(Gem otherGem){
+        Vector2Int tempPosIndex = otherGem.posIndex;
+        otherGem.posIndex = posIndex;
+        posIndex = tempPosIndex;
+
+    }
+
+    private void SwapGemNames(Gem otherGem){
+        string tempName = otherGem.name;
+        otherGem.name = this.name;
+        this.name = tempName;
     }
 }

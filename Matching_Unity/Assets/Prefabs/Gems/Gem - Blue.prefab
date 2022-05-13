@@ -97,8 +97,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c453c4de7d843143bba9c381cecda2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMouseGem: 0
   originalGemVectorPos: {x: 0, y: 0, z: 0}
+  newGemVectorPos: {x: 0, y: 0, z: 0}
   originalGemPos: {x: 0, y: 0}
+  newGemPos: {x: 0, y: 0}
   posIndex: {x: 0, y: 0}
   board: {fileID: 0}
 --- !u!58 &7147876739636147707
@@ -116,7 +119,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.44358975
+  m_Radius: 0.25
 --- !u!50 &-8271279709801986572
 Rigidbody2D:
   serializedVersion: 4
