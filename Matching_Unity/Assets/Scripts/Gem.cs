@@ -20,6 +20,10 @@ public class Gem : MonoBehaviour
     [HideInInspector]
     public Board board;
 
+    public enum GemType { blue, green, red, yellow, purple};
+    public GemType type;
+    public bool isMatched;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -64,16 +68,18 @@ public class Gem : MonoBehaviour
         col.gameObject.transform.position = originalGemVectorPos;
         col.gameObject.GetComponent<Gem>().originalGemVectorPos = originalGemVectorPos;
         originalGemVectorPos = newGemVectorPos;
-        SwapGemPosIndex(col.GetComponent<Gem>());
         SwapBoardIndex(col.GetComponent<Gem>());
+        SwapGemPosIndex(col.GetComponent<Gem>());
         SwapGemNames(col.GetComponent<Gem>());
         //Debug.Log(board.allGems[posIndex.x, posIndex.y].GetComponent<Gem>().posIndex.x + " "+ board.allGems[posIndex.x, posIndex.y].GetComponent<Gem>().posIndex.y );
         }
     }
 
     private void SwapBoardIndex(Gem otherGem){
-        board.allGems[otherGem.posIndex.x, otherGem.posIndex.y] = this;
+        Gem tempGem = otherGem;
         board.allGems[posIndex.x, posIndex.y] = otherGem;
+        board.allGems[tempGem.posIndex.x, tempGem.posIndex.y] = this.GetComponent<Gem>();
+        
 
     }
 
