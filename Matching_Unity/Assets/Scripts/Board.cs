@@ -64,7 +64,7 @@ public class Board : MonoBehaviour
         
     }
 
-    private IEnumerator SmoothLerp(float waitTime,Gem gemStartPosition, Vector2 posTarget){
+    public IEnumerator SmoothLerp(float waitTime,Gem gemStartPosition, Vector2 posTarget){
         float elapsedTime =0;
         while(elapsedTime<waitTime){
             gemStartPosition.transform.position = Vector3.Lerp(gemStartPosition.transform.position, posTarget, (elapsedTime/waitTime));

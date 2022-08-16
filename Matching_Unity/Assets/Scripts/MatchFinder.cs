@@ -82,6 +82,7 @@ public class MatchFinder : MonoBehaviour
         
         
     }
+    
 
     private void MoveGemsDownAfterDestruction(){
         int nullCounter =0;
@@ -96,7 +97,10 @@ public class MatchFinder : MonoBehaviour
                     Vector3 posUpdate = new Vector3(0,nullCounter);
                     board.allGems[x,y].posIndex.y -= nullCounter;
                     board.allGems[x,y].originalGemVectorPos -= posUpdate;
-                    board.allGems[x,y].transform.position -= posUpdate;
+                    Vector3 targetPos = board.allGems[x,y].transform.position;
+                    targetPos -= posUpdate;
+                    StartCoroutine(board.SmoothLerp(.5f,board.allGems[x,y],targetPos));
+                    //board.allGems[x,y].transform.position -= posUpdate;
                     board.allGems[x,y-nullCounter] = board.allGems[x,y];
                     board.allGems[x,y] = null;
                     
@@ -144,6 +148,24 @@ public class MatchFinder : MonoBehaviour
                 }
             }
         }
+        CheckMisplacedGems();
+    }
+
+    private void CheckMisplacedGems(){
+        List<Gem> foundGems = new List<Gem>();
+        foundGems.AddRange(FindObjectsOfType<Gem>());
+        for(int x = 0; x<board.width;x++){
+            for(int y = 0; y<board.height; y++){
+                if(foundGems.Contains(board.allGems[x,y])){
+                    foundGems.Remove(board.allGems[x,y]);
+                }
+            }
+        }
+        foreach(Gem g in foundGems){
+            Destroy(g.gameObject);
+        }
+
+
     }
 
 }
