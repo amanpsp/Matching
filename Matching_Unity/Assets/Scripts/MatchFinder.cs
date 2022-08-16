@@ -62,4 +62,88 @@ public class MatchFinder : MonoBehaviour
                 }
     }
 
+     public void DestroyMatches(){
+        for(int i = 0; i<currentMatches.Count; i++){
+            if(currentMatches[i] != null){
+                DestroyMatchedGemAt(currentMatches[i].posIndex);
+                
+            }
+        }
+        currentMatches.Clear();
+        StartCoroutine(DecreaseRowCo());
+
+    }
+
+    private IEnumerator DecreaseRowCo(){
+        yield return new WaitForSeconds(.2f);
+
+        MoveGemsDownAfterDestruction();
+        StartCoroutine (FillBoardCo());
+        
+        
+    }
+
+    private void MoveGemsDownAfterDestruction(){
+        int nullCounter =0;
+
+        for( int x=0; x<board.width;x++)
+        {
+            for(int y=0; y<board.height;y++)
+            {
+                if(board.allGems[x,y]==null){
+                    nullCounter++;
+                } else if(nullCounter>0){
+                    Vector3 posUpdate = new Vector3(0,nullCounter);
+                    board.allGems[x,y].posIndex.y -= nullCounter;
+                    board.allGems[x,y].originalGemVectorPos -= posUpdate;
+                    board.allGems[x,y].transform.position -= posUpdate;
+                    board.allGems[x,y-nullCounter] = board.allGems[x,y];
+                    board.allGems[x,y] = null;
+                    
+                }                 
+                
+            }
+            nullCounter = 0;
+        }
+    }
+
+    private void DestroyMatchedGemAt(Vector2Int pos){
+        if(board.allGems[pos.x,pos.y] != null){
+            if(board.allGems[pos.x,pos.y].isMatched){
+                Destroy(board.allGems[pos.x,pos.y].gameObject);
+                board.allGems[pos.x,pos.y] = null;
+            }
+        }
+    }
+
+    private IEnumerator FillBoardCo(){
+        yield return new WaitForSeconds(.5f);
+        RefillBoard();
+
+        yield return new WaitForSeconds(.5f);
+
+        FindAllMatches();
+
+        if(currentMatches.Count > 0){
+            yield return new WaitForSeconds(1.5f);
+            DestroyMatches();
+        }else{
+        yield return new WaitForSeconds(.5f);
+        board.currentState = Board.BoardState.move;
+        }
+    }
+
+    private void RefillBoard(){
+        for( int x=0; x<board.width;x++)
+        {
+            for(int y=0; y<board.height;y++)
+            {
+                if(board.allGems[x,y]==null){
+                int gemToUse = Random.Range(0, board.gems.Length);
+                board.SpawnGem(new Vector2Int(x,y), board.gems[gemToUse]);
+                }
+            }
+        }
+    }
+
 }

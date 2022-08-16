@@ -11,7 +11,9 @@ public class Board : MonoBehaviour
     public GameObject bgTilePrefab;
     public Gem[] gems;
     public Gem[,] allGems;
-    private MatchFinder matchFind;
+    public MatchFinder matchFind;
+    public enum BoardState { wait, move};
+    public BoardState currentState = BoardState.move;
 
     private void Awake(){
         matchFind = FindObjectOfType<MatchFinder>();
@@ -25,7 +27,7 @@ public class Board : MonoBehaviour
 
     private void Update(){
 
-        matchFind.FindAllMatches();
+       // matchFind.FindAllMatches();
 
     }
 
@@ -51,12 +53,27 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void SpawnGem(Vector2Int pos,Gem gemToSpawn){
-        Gem gem = Instantiate(gemToSpawn, new Vector3(pos.x, pos.y, 0), Quaternion.identity);
+    public void SpawnGem(Vector2Int pos,Gem gemToSpawn){
+        Gem gem = Instantiate(gemToSpawn, new Vector3(pos.x, pos.y + height, 0), Quaternion.identity);
+        StartCoroutine(SmoothLerp(1f,gem,pos));
         gem.transform.parent = this.transform;
+        //gem.transform.position = new Vector3(pos.x, pos.y,0);
         gem.name = "Gem - "+ pos.x +"," + pos.y;
         allGems[pos.x,pos.y]=gem;
         gem.SetupGem(pos,this);
+        
+    }
+
+    private IEnumerator SmoothLerp(float waitTime,Gem gemStartPosition, Vector2 posTarget){
+        float elapsedTime =0;
+        while(elapsedTime<waitTime){
+            gemStartPosition.transform.position = Vector3.Lerp(gemStartPosition.transform.position, posTarget, (elapsedTime/waitTime));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        gemStartPosition.transform.position = posTarget;
+        yield return null;
+        
     }
 
     private bool MatchesAt(Vector2Int posToCheck, Gem gemToCheck){
@@ -75,4 +92,6 @@ public class Board : MonoBehaviour
         return false;
 
     }
+
+
 }

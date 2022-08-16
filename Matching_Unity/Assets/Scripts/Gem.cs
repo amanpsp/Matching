@@ -27,13 +27,13 @@ public class Gem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        originalGemVectorPos = this.gameObject.GetComponent<Transform>().position;
+        originalGemVectorPos = new Vector3(posIndex.x, posIndex.y);//this.gameObject.GetComponent<Transform>().position;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        //transform.position = Vector2.Lerp(transform.position,posIndex, 3 *Time.deltaTime);
     }
 
     public void SetupGem(Vector2Int pos, Board theBoard){
@@ -42,22 +42,31 @@ public class Gem : MonoBehaviour
     }
 
     void OnMouseDown(){
+        if(board.currentState == Board.BoardState.move){
         isMouseGem = true;
         originalGemPos = posIndex;
         originalGemVectorPos = this.transform.position;
         offSet = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x,Input.mousePosition.y));
         transform.position = (Camera.main.ScreenToWorldPoint(Input.mousePosition)+offSet);
+        }
     }
 
     void OnMouseDrag(){
+        if(board.currentState == Board.BoardState.move){
         Vector3 currentScreenPoint = new Vector3(Input.mousePosition.x,Input.mousePosition.y);
         Vector3 currentPosition = (Camera.main.ScreenToWorldPoint(currentScreenPoint)+offSet);
         transform.position = currentPosition;
+        }
     }
 
     void OnMouseUp(){
+        if(board.currentState == Board.BoardState.move){
         isMouseGem = false;
         transform.position = originalGemVectorPos;
+        board.currentState = Board.BoardState.wait;
+        board.matchFind.FindAllMatches();
+        board.matchFind.DestroyMatches();
+        }
     }
 
     void OnTriggerEnter2D(Collider2D col)
