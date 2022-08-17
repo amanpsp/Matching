@@ -16,6 +16,7 @@ public class Board : MonoBehaviour
     public BoardState currentState = BoardState.move;
     public Gem bomb;
     public float bombChance = 2f;
+    public RoundManager roundMan;
 
     private void Awake(){
         matchFind = FindObjectOfType<MatchFinder>();
@@ -24,7 +25,7 @@ public class Board : MonoBehaviour
     {
         allGems = new Gem[width,height];
         SetUp();
-        
+        roundMan = FindObjectOfType<RoundManager>();
     }
 
     private void Update(){

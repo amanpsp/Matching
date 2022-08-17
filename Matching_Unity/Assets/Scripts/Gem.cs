@@ -45,7 +45,7 @@ public class Gem : MonoBehaviour
     }
 
     void OnMouseDown(){
-        if(board.currentState == Board.BoardState.move){
+        if(board.currentState == Board.BoardState.move && board.roundMan.roundTime > 0){
         isMouseGem = true;
         originalGemPos = posIndex;
         originalGemVectorPos = this.transform.position;
