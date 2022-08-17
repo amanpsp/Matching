@@ -77,7 +77,8 @@ public class Gem : MonoBehaviour
         if(isMouseGem == true)
         {
         newGemVectorPos = col.gameObject.GetComponent<Gem>().originalGemVectorPos;
-        col.gameObject.transform.position = originalGemVectorPos;
+        //col.gameObject.transform.position = originalGemVectorPos;
+        StartCoroutine(board.SmoothLerp(.5f,col.gameObject.GetComponent<Gem>(), originalGemVectorPos));
         col.gameObject.GetComponent<Gem>().originalGemVectorPos = originalGemVectorPos;
         originalGemVectorPos = newGemVectorPos;
         SwapBoardIndex(col.GetComponent<Gem>());
