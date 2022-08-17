@@ -19,10 +19,12 @@ public class Gem : MonoBehaviour
     public Vector2Int posIndex;
     [HideInInspector]
     public Board board;
+    public GameObject destroyEffect;
 
-    public enum GemType { blue, green, red, yellow, purple};
+    public enum GemType { blue, green, red, yellow, purple, bomb};
     public GemType type;
     public bool isMatched;
+    public int blastSize = 1;
 
     // Start is called before the first frame update
     void Start()
@@ -38,6 +40,7 @@ public class Gem : MonoBehaviour
 
     public void SetupGem(Vector2Int pos, Board theBoard){
         posIndex = pos;
+        originalGemVectorPos = new Vector3(posIndex.x, posIndex.y);
         board = theBoard;
     }
 

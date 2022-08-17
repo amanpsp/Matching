@@ -244,6 +244,10 @@ MonoBehaviour:
   - {fileID: 2463044660082231682, guid: 4152fe0c12d02914a847cb153f53fbd1, type: 3}
   - {fileID: 3102644909365296486, guid: 45cc146d21b0d854491a10c179b52d54, type: 3}
   - {fileID: 7962788695369454714, guid: c4a4bdd8f2783f3469bb6446990e42ac, type: 3}
+  matchFind: {fileID: 0}
+  currentState: 1
+  bomb: {fileID: 3494867611508346401, guid: 3823673a1c6890c4f890478405ddd350, type: 3}
+  bombChance: 2
 --- !u!4 &1072597462
 Transform:
   m_ObjectHideFlags: 0
@@ -287,6 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 299eeecbee912044aaa1dee3fbf141f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentMatches: []
 --- !u!4 &1888520395
 Transform:
   m_ObjectHideFlags: 0

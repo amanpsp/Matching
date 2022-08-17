@@ -14,6 +14,8 @@ public class Board : MonoBehaviour
     public MatchFinder matchFind;
     public enum BoardState { wait, move};
     public BoardState currentState = BoardState.move;
+    public Gem bomb;
+    public float bombChance = 2f;
 
     private void Awake(){
         matchFind = FindObjectOfType<MatchFinder>();
@@ -28,6 +30,9 @@ public class Board : MonoBehaviour
     private void Update(){
 
        // matchFind.FindAllMatches();
+       if(Input.GetKeyDown(KeyCode.S)){
+        ShuffleBoard();
+       }
 
     }
 
@@ -54,6 +59,9 @@ public class Board : MonoBehaviour
     }
 
     public void SpawnGem(Vector2Int pos,Gem gemToSpawn){
+        if(Random.Range(0f, 100f)<bombChance){
+            gemToSpawn = bomb;
+        }
         Gem gem = Instantiate(gemToSpawn, new Vector3(pos.x, pos.y + height, 0), Quaternion.identity);
         StartCoroutine(SmoothLerp(1f,gem,pos));
         gem.transform.parent = this.transform;
@@ -91,6 +99,38 @@ public class Board : MonoBehaviour
 
         return false;
 
+    }
+
+    public void ShuffleBoard(){
+        if(currentState != BoardState.wait){
+            currentState = BoardState.wait;
+            List<Gem> gemsOnBoard = new List<Gem>();
+
+            for(int x = 0; x<width; x++){
+                for(int y = 0; y<height; y++){
+                    gemsOnBoard.Add(allGems[x,y]);
+                    allGems[x,y] = null;
+                }
+            }
+
+             for(int x = 0; x<width; x++){
+                for(int y = 0; y<height; y++){
+                    int gemToUse = Random.Range(0,gemsOnBoard.Count);
+                    int iterations = 0;
+                     while(iterations < 100 && gemsOnBoard.Count>1 && MatchesAt(new Vector2Int(x,y), gemsOnBoard[gemToUse])){
+                        gemToUse = Random.Range(0, gemsOnBoard.Count);
+                        iterations++;
+                    } 
+
+                    gemsOnBoard[gemToUse].SetupGem(new Vector2Int(x,y), this);
+                    allGems[x,y] = gemsOnBoard[gemToUse];
+                    StartCoroutine(SmoothLerp(1f,allGems[x,y],new Vector2Int(x,y)));
+                    gemsOnBoard.RemoveAt(gemToUse);
+                }
+            }
+
+        } 
+        StartCoroutine(matchFind.FillBoardCo());
     }
 
 
