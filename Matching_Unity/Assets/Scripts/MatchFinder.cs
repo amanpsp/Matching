@@ -8,7 +8,6 @@ public class MatchFinder : MonoBehaviour
     private Board board;
     public List<Gem> currentMatches = new List<Gem>();
     public List<Gem> bombMarks = new List<Gem>();
-    public bool currentlyDestroying = false;
 
     private void Awake(){
         board = FindObjectOfType<Board>();
@@ -21,7 +20,7 @@ public class MatchFinder : MonoBehaviour
             for(int y=0; y<board.height;y++)
             {
                 Gem currentGem = board.allGems[x,y];
-                CheckHorizontalMatch(currentGem,x,y); //in the future might change destruction to happen here so it can destroy each match sequentially rather than in groups of the colors as it is now
+                CheckHorizontalMatch(currentGem,x,y);
                 CheckVerticalMatch(currentGem,x,y);
             }
         }
@@ -29,9 +28,6 @@ public class MatchFinder : MonoBehaviour
             currentMatches = currentMatches.Distinct().ToList();
         }
         CheckForBombs();
-        currentlyDestroying=true;
-        StartCoroutine(board.matchFind.DestroyMatches());
-        //StartCoroutine(DecreaseRowCo());
     }
 
     public void CheckForBombs(){
@@ -125,10 +121,7 @@ public class MatchFinder : MonoBehaviour
         //destroy them, then wait a little and start counting how many were matched for the next set and destroy those. will also be able to use the matchLength
         //variable to determine unique actions depending on how many of a gem type were matched at once
    public   IEnumerator DestroyMatches(){
-    //currentlyDestroying = true;
-        if(currentMatches.Count>0){
-            Gem control = currentMatches[0];
-        
+        Gem control = currentMatches[0];
         for(int i = 0; i<currentMatches.Count; i++){
             if(currentMatches[i].type == control.type){
                 DestroyMatchedGemAt(currentMatches[i].posIndex);
@@ -139,25 +132,14 @@ public class MatchFinder : MonoBehaviour
                 DestroyMatchedGemAt(currentMatches[i].posIndex);
             }
         }
-        }
-        if(bombMarks.Count>0){
+        if(bombMarks.Count>=1){
         for(int x = 0; x<bombMarks.Count; x++){
             DestroyMatchedGemAt(bombMarks[x].posIndex);
         }
         bombMarks.Clear();
         }
         currentMatches.Clear();
-        yield return new WaitForSeconds(.2f);
-        MoveGemsDownAfterDestruction();
-        RefillBoard();
-        FindAllMatches();
-        
-        board.currentState = Board.BoardState.move;
-        //StartCoroutine(DecreaseRowCo());
-        //currentlyDestroying=false;
-        
-        
-         
+         StartCoroutine(DecreaseRowCo());
     }
 
     /* private void StartSequentialDestroy(int matchLength, int currentMatchesPosition){
@@ -184,12 +166,9 @@ public class MatchFinder : MonoBehaviour
     } */
 
     private IEnumerator DecreaseRowCo(){
-        while(currentlyDestroying==true){
-            yield return new WaitForSeconds(.2f);
-        }
+        yield return new WaitForSeconds(.2f);
 
         MoveGemsDownAfterDestruction();
-         yield return new WaitForSeconds(.2f);
         StartCoroutine (FillBoardCo());
         
         
