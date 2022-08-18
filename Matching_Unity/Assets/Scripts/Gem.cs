@@ -21,7 +21,7 @@ public class Gem : MonoBehaviour
     public Board board;
     public GameObject destroyEffect;
 
-    public enum GemType { blue, green, red, yellow, purple, bomb};
+    public enum GemType { blue, green, red, yellow, purple, bomb, placeholder};
     public GemType type;
     public bool isMatched;
     public int blastSize = 1;
@@ -69,7 +69,7 @@ public class Gem : MonoBehaviour
         board.currentState = Board.BoardState.wait;
         board.matchFind.FindAllMatches();
         //board.matchFind.DestroyMatches();
-        StartCoroutine(board.matchFind.DestroyMatches());
+        //StartCoroutine(board.matchFind.DestroyMatches());
         }
     }
 
