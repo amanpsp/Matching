@@ -7,6 +7,7 @@ public class MatchFinder : MonoBehaviour
 {
     private Board board;
     public List<Gem> currentMatches = new List<Gem>();
+    public List<Gem> bombMarks = new List<Gem>();
 
     private void Awake(){
         board = FindObjectOfType<Board>();
@@ -72,13 +73,15 @@ public class MatchFinder : MonoBehaviour
                 if(x>=0 && x<board.width && y>=0 && y<board.height){
                     if(board.allGems[x,y]!=null){
                         board.allGems[x,y].isMatched = true;
-                        currentMatches.Add(board.allGems[x,y]);
+                        //currentMatches.Add(board.allGems[x,y]);
+                        bombMarks.Add(board.allGems[x,y]);
                     }
                 }
             }
         }
 
-        currentMatches = currentMatches.Distinct().ToList();
+        //currentMatches = currentMatches.Distinct().ToList();
+        bombMarks = bombMarks.Distinct().ToList();
     }
 
     private void CheckHorizontalMatch(Gem currentGem, int x, int y){
@@ -114,18 +117,53 @@ public class MatchFinder : MonoBehaviour
                     }
                 }
     }
-
-     public void DestroyMatches(){
+        //now with two different lists for matched gems and bombed gems i can loop through current matches and count how many of a match there is and then 
+        //destroy them, then wait a little and start counting how many were matched for the next set and destroy those. will also be able to use the matchLength
+        //variable to determine unique actions depending on how many of a gem type were matched at once
+   public   IEnumerator DestroyMatches(){
+        Gem control = currentMatches[0];
         for(int i = 0; i<currentMatches.Count; i++){
-            if(currentMatches[i] != null){
+            if(currentMatches[i].type == control.type){
                 DestroyMatchedGemAt(currentMatches[i].posIndex);
-                
+            }
+            if(currentMatches[i].type != control.type){
+                control = currentMatches[i];
+                yield return new WaitForSeconds(1f);
+                DestroyMatchedGemAt(currentMatches[i].posIndex);
             }
         }
+        if(bombMarks.Count>=1){
+        for(int x = 0; x<bombMarks.Count; x++){
+            DestroyMatchedGemAt(bombMarks[x].posIndex);
+        }
+        bombMarks.Clear();
+        }
         currentMatches.Clear();
-        StartCoroutine(DecreaseRowCo());
-
+         StartCoroutine(DecreaseRowCo());
     }
+
+    /* private void StartSequentialDestroy(int matchLength, int currentMatchesPosition){
+        for(int i = 0; i<matchLength;i++){
+            if(currentMatches[i]!=null){
+            DestroyMatchedGemAt(currentMatches[i].posIndex);
+            } 
+        }
+        WaitingForTime(0f);
+
+    } */
+    /* private IEnumerator CoRoWait(float timeToWait, int i){
+        yield return new WaitForSeconds(timeToWait);
+        DestroyMatchedGemAt(currentMatches[i].posIndex);
+    } */
+
+    /* private void WaitingForTime(float time){
+        while(time>0){
+            time -= Time.deltaTime;
+            if(time <= 0){
+                time = 0;
+            }
+        }
+    } */
 
     private IEnumerator DecreaseRowCo(){
         yield return new WaitForSeconds(.2f);
@@ -170,6 +208,7 @@ public class MatchFinder : MonoBehaviour
                 Instantiate(board.allGems[pos.x,pos.y].destroyEffect, new Vector2(pos.x,pos.y), Quaternion.identity);
                 Destroy(board.allGems[pos.x,pos.y].gameObject);
                 board.allGems[pos.x,pos.y] = null;
+                //currentMatches.RemoveAt(0);
             }
         }
     }

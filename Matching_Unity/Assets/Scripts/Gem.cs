@@ -68,7 +68,8 @@ public class Gem : MonoBehaviour
         transform.position = originalGemVectorPos;
         board.currentState = Board.BoardState.wait;
         board.matchFind.FindAllMatches();
-        board.matchFind.DestroyMatches();
+        //board.matchFind.DestroyMatches();
+        StartCoroutine(board.matchFind.DestroyMatches());
         }
     }
 
@@ -78,7 +79,7 @@ public class Gem : MonoBehaviour
         {
         newGemVectorPos = col.gameObject.GetComponent<Gem>().originalGemVectorPos;
         //col.gameObject.transform.position = originalGemVectorPos;
-        StartCoroutine(board.SmoothLerp(.5f,col.gameObject.GetComponent<Gem>(), originalGemVectorPos));
+        StartCoroutine(board.SmoothLerp(.25f,col.gameObject.GetComponent<Gem>(), originalGemVectorPos));
         col.gameObject.GetComponent<Gem>().originalGemVectorPos = originalGemVectorPos;
         originalGemVectorPos = newGemVectorPos;
         SwapBoardIndex(col.GetComponent<Gem>());
@@ -104,8 +105,12 @@ public class Gem : MonoBehaviour
     }
 
     private void SwapGemNames(Gem otherGem){
-        string tempName = otherGem.name;
+        /* string tempName = otherGem.name;
         otherGem.name = this.name;
-        this.name = tempName;
+        this.name = tempName; */
+
+        string tempName = otherGem.type + " Gem - "+ this.posIndex.x +"," + this.posIndex.y;
+        this.name = this.type + " Gem - "+ otherGem.posIndex.x +"," + otherGem.posIndex.y;
+        otherGem.name = tempName;
     }
 }

@@ -67,7 +67,7 @@ public class Board : MonoBehaviour
         StartCoroutine(SmoothLerp(1f,gem,pos));
         gem.transform.parent = this.transform;
         //gem.transform.position = new Vector3(pos.x, pos.y,0);
-        gem.name = "Gem - "+ pos.x +"," + pos.y;
+        gem.name = gem.type + " Gem - "+ pos.x +"," + pos.y;
         allGems[pos.x,pos.y]=gem;
         gem.SetupGem(pos,this);
         

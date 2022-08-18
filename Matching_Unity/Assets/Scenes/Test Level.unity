@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca7d6b5b6da1b5b4caefd5c2418e3d53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roundTime: 5
+  roundTime: 60
 --- !u!4 &103864748
 Transform:
   m_ObjectHideFlags: 0
@@ -1621,6 +1621,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentMatches: []
+  bombMarks: []
 --- !u!4 &1888520395
 Transform:
   m_ObjectHideFlags: 0
