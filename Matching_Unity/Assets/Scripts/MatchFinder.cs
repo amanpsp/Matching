@@ -121,17 +121,20 @@ public class MatchFinder : MonoBehaviour
         //destroy them, then wait a little and start counting how many were matched for the next set and destroy those. will also be able to use the matchLength
         //variable to determine unique actions depending on how many of a gem type were matched at once
    public   IEnumerator DestroyMatches(){
-        Gem control = currentMatches[0];
-        for(int i = 0; i<currentMatches.Count; i++){
-            if(currentMatches[i].type == control.type){
-                DestroyMatchedGemAt(currentMatches[i].posIndex);
-            }
-            if(currentMatches[i].type != control.type){
-                control = currentMatches[i];
-                yield return new WaitForSeconds(1f);
-                DestroyMatchedGemAt(currentMatches[i].posIndex);
+        if(currentMatches.Count!=0){
+            Gem control = currentMatches[0];
+            for(int i = 0; i<currentMatches.Count; i++){
+                if(currentMatches[i].type == control.type){
+                    DestroyMatchedGemAt(currentMatches[i].posIndex);
+                }
+                if(currentMatches[i].type != control.type){
+                    control = currentMatches[i];
+                    yield return new WaitForSeconds(1f);
+                    DestroyMatchedGemAt(currentMatches[i].posIndex);
+                }
             }
         }
+        
         if(bombMarks.Count>=1){
         for(int x = 0; x<bombMarks.Count; x++){
             DestroyMatchedGemAt(bombMarks[x].posIndex);
@@ -222,12 +225,12 @@ public class MatchFinder : MonoBehaviour
         FindAllMatches();
 
         if(currentMatches.Count > 0){
-            yield return new WaitForSeconds(1.5f);
-            DestroyMatches();
-        }else{
-        yield return new WaitForSeconds(.5f);
+            yield return new WaitForSeconds(.5f);
+            StartCoroutine(DestroyMatches());
+        }//else{
+        //yield return new WaitForSeconds(.5f);
         board.currentState = Board.BoardState.move;
-        }
+        //}
     }
 
     private void RefillBoard(){
