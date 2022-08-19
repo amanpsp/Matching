@@ -25,8 +25,6 @@ public class Gem : MonoBehaviour
     public GemType type;
     public bool isMatched;
     public int blastSize = 1;
-    public int matchNumber = 0;
-    public bool junction;
 
     // Start is called before the first frame update
     void Start()
@@ -53,7 +51,6 @@ public class Gem : MonoBehaviour
         originalGemVectorPos = this.transform.position;
         offSet = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x,Input.mousePosition.y));
         transform.position = (Camera.main.ScreenToWorldPoint(Input.mousePosition)+offSet);
-        
         }
     }
 
@@ -69,10 +66,10 @@ public class Gem : MonoBehaviour
         if(board.currentState == Board.BoardState.move){
         isMouseGem = false;
         transform.position = originalGemVectorPos;
-        //board.currentState = Board.BoardState.wait;
+        board.currentState = Board.BoardState.wait;
         board.matchFind.FindAllMatches();
         //board.matchFind.DestroyMatches();
-        //StartCoroutine(board.matchFind.DestroyMatches());
+        StartCoroutine(board.matchFind.DestroyMatches());
         }
     }
 
@@ -112,7 +109,8 @@ public class Gem : MonoBehaviour
         otherGem.name = this.name;
         this.name = tempName; */
 
-        this.name = this.type + " Gem - "+ this.posIndex.x +"," + this.posIndex.y;
-        otherGem.name = otherGem.type + "Gem - " + otherGem.posIndex.x +"," + otherGem.posIndex.y;
+        string tempName = otherGem.type + " Gem - "+ this.posIndex.x +"," + this.posIndex.y;
+        this.name = this.type + " Gem - "+ otherGem.posIndex.x +"," + otherGem.posIndex.y;
+        otherGem.name = tempName;
     }
 }
