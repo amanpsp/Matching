@@ -8,6 +8,7 @@ public class MatchFinder : MonoBehaviour
     private Board board;
     public List<Gem> currentMatches = new List<Gem>();
     public List<Gem> bombMarks = new List<Gem>();
+    public Queue<Gem> floodFill = new Queue<Gem>();
 
     private void Awake(){
         board = FindObjectOfType<Board>();
@@ -15,20 +16,176 @@ public class MatchFinder : MonoBehaviour
 
     public void FindAllMatches(){
         
-        for( int x=0; x<board.width;x++)
-        {
-            for(int y=0; y<board.height;y++)
+        int matchNumber = 1;
+        if(board.currentState = Board.BoardState.wait;){
+            for( int x=0; x<board.width;x++)
             {
-                Gem currentGem = board.allGems[x,y];
-                CheckHorizontalMatch(currentGem,x,y);
-                CheckVerticalMatch(currentGem,x,y);
+                for(int y=0; y<board.height;y++)
+                {
+                    Gem currentGem = board.allGems[x,y];
+                    CheckHorizontalMatch(currentGem,x,y,matchNumber);
+                     
+                    matchNumber++;
+                    
+                }
             }
-        }
+            //CheckMatchesAround();
+        
         if(currentMatches.Count > 0){
+            currentMatches = currentMatches.OrderBy(gem => gem.matchNumber).ToList();
             currentMatches = currentMatches.Distinct().ToList();
+            //floodFill.Enqueue(currentMatches[0])
+            //FloodCheckMatchNumbers(0);
+            //currentMatches = currentMatches.OrderBy(gem => gem.matchNumber).ToList();
         }
         CheckForBombs();
+        //StartCoroutine(board.matchFind.DestroyMatches());
+        }
     }
+
+    private int FloodCheckMatchNumbers(int currentPosition){
+        //int currentPosition = 0;
+        while(currentPosition<currentMatches.Count){
+            Gem currentGem = currentMatches[currentPosition];
+            //check in all 4 directions around the gem if there is a matching type
+            //if there is a match, check if matchnumbers are the same, if not then set other gem match number to current gem matchnumber
+            if(currentGem.posIndex.x+1 < board.height && currentGem.type == board.allGems[currentGem.posIndex.x+1,currentGem.posIndex.y].type){
+                if(currentGem.matchNumber != board.allGems[currentGem.posIndex.x+1,currentGem.posIndex.y].matchNumber){
+                    board.allGems[currentGem.posIndex.x+1,currentGem.posIndex.y].matchNumber = currentGem.matchNumber;
+                    
+                }
+            }
+            if(currentGem.posIndex.x-1 > 0 && currentGem.type == board.allGems[currentGem.posIndex.x-1,currentGem.posIndex.y].type){
+                if(currentGem.matchNumber != board.allGems[currentGem.posIndex.x-1,currentGem.posIndex.y].matchNumber){
+                    board.allGems[currentGem.posIndex.x-1,currentGem.posIndex.y].matchNumber = currentGem.matchNumber;
+                }
+            }
+            if(currentGem.posIndex.y-1 > 0 && currentGem.type == board.allGems[currentGem.posIndex.x,currentGem.posIndex.y-1].type){
+                if(currentGem.matchNumber != board.allGems[currentGem.posIndex.x,currentGem.posIndex.y-1].matchNumber){
+                    board.allGems[currentGem.posIndex.x,currentGem.posIndex.y-1].matchNumber = currentGem.matchNumber;
+                }
+            }
+            if(currentGem.posIndex.y+1 < board.width && currentGem.type == board.allGems[currentGem.posIndex.x,currentGem.posIndex.y+1].type){
+                if(currentGem.matchNumber != board.allGems[currentGem.posIndex.x,currentGem.posIndex.y+1].matchNumber){
+                    board.allGems[currentGem.posIndex.x,currentGem.posIndex.y+1].matchNumber = currentGem.matchNumber;
+                }
+            }
+
+            currentPosition = FloodCheckMatchNumbers(currentPosition+1);
+        }
+        return currentPosition;
+
+    }
+
+    /* private void CheckMatchesAround(){
+        int sweepCount = 0;
+        Vector2Int start = new Vector2Int(0,0);
+        Gem a = board.allGems[start.x, start.y];
+        Gem b = null;
+        Gem c = null;
+        while(start.x<board.width){
+            if(start.x + 1 < board.width){ b = board.allGems[start.x+1,start.y];}   
+            if(start.x + 2 < board.width){ c = board.allGems[start.x+2, start.y];}              
+            while(c!=null){
+                if(a.type == b.type && c.type == a.type){
+                    a.isMatched = b.isMatched = c.isMatched = true;
+                    a.matchNumber = b.matchNumber = c.matchNumber = sweepCount;
+                    currentMatches.Add(a);
+                } else{
+                    if(a.matchNumber == sweepCount){
+                        currentMatches.Add(a);
+                        if(b.matchNumber != sweepCount){
+                            //CreateMatch(matchTiles, Match.Dir.HORIZ);
+                            //matchTiles = new List<Tile>(); i dont get this part maybe its adding all the matches to a seperate list and indication the direction
+
+                        }
+                    }
+                }
+                if(start.x+3>=board.width){
+                    if(a.matchNumber == sweepCount && b.matchNumber == sweepCount){
+                        currentMatches.Add(b);
+                        if(c.matchNumber == sweepCount){
+                            currentMatches.Add(c);
+                        }
+                    }
+                    if(currentMatches.Count>2){
+                        //CreateMatch(matchTiles, Match.Dir.HORIZ);
+                            //matchTiles = new List<Tile>(); i dont get this part maybe its adding all the matches to a seperate list and indication the direction 
+                    }
+                    a=b;
+                    b=c;
+                    if(b.posIndex.x+1<board.width){c = board.allGems[b.posIndex.x+1, b.posIndex.y];}
+                    
+                }
+                start.x = start.x+1;
+                if(start.x<board.width){a = board.allGems[start.x, start.y];}
+                
+            }
+        }
+            sweepCount++;
+
+            bool junction = false;
+            start.x =0; start.y = 0;
+            a = board.allGems[start.x, start.y];
+            while(a!=null){
+                if(start.y + 1 < board.height){ b = board.allGems[start.x,start.y+1];}   
+                if(start.y + 2 < board.height){ c = board.allGems[start.x, start.y+2];}
+                while(c!=null){
+                    if(a.type == b.type && c.type == a.type){
+                    a.isMatched = b.isMatched = c.isMatched = true;
+                    a.matchNumber = b.matchNumber = c.matchNumber = sweepCount;
+                    currentMatches.Add(a);
+                    if(a.isMatched == true){
+                        a.junction = junction = true;
+                    }
+                    else{
+                        if(a.matchNumber == sweepCount){
+                            currentMatches.Add(a);
+                            if(a.isMatched == true){
+                                a.junction = junction = true;
+                            }
+                            if(b.matchNumber != sweepCount){
+                                //CreateMatch(matchTiles, Match.Dir.HORIZ);
+                                //matchTiles = new List<Tile>(); i dont get this part maybe its adding all the matches to a seperate list and indication the direction 
+                                junction = false;
+                            }
+                        }
+                    }
+                    if(start.y+3 >=board.height){
+                        if(a.matchNumber == sweepCount && b.matchNumber == sweepCount){
+                            currentMatches.Add(b);
+                            if(b.isMatched == true){
+                                b.junction = junction = true;
+                            }
+                            if(c.matchNumber == sweepCount){
+                                currentMatches.Add(c);
+                                if(c.isMatched == true){
+                                    c.junction = junction = true;
+                                }
+                            }
+                        }
+                        if(currentMatches.Count>2){
+                            //CreateMatch(matchTiles, Match.Dir.HORIZ);
+                            //matchTiles = new List<Tile>(); i dont get this part maybe its adding all the matches to a seperate list and indication the direction     
+                            junction = false;
+                        }
+                    }
+                    a=b;
+                    b=c;
+                    c = board.allGems[b.posIndex.x, b.posIndex.y+1];
+                }
+               
+                start.x = start.x+1; start.y = start.y;
+                a = board.allGems[start.x,start.y];
+                
+
+            }
+        
+        }
+    } */
+       
+    
+        
 
     public void CheckForBombs(){
         for(int i = 0; i<currentMatches.Count; i++){
@@ -65,6 +222,7 @@ public class MatchFinder : MonoBehaviour
                 }
             }
         }
+        StartCoroutine(board.matchFind.DestroyMatches());
     }
 
     public void MarkBombArea(Vector2Int bombPos, Gem theBomb){
@@ -84,10 +242,15 @@ public class MatchFinder : MonoBehaviour
         bombMarks = bombMarks.Distinct().ToList();
     }
 
-    private void CheckHorizontalMatch(Gem currentGem, int x, int y){
-                if(currentGem!=null&&x>0&&x<board.width-1){
-                    Gem leftGem = board.allGems[x-1,y];
-                    Gem rightGem = board.allGems[x+1,y];
+    private void CheckHorizontalMatch(Gem currentGem, int x, int y,int matchNumber){
+        Gem leftGem = null;
+        Gem rightGem = null; 
+                if(currentGem!=null&&x<board.width){
+                    if(x-1>=0){ leftGem = board.allGems[x-1,y];}
+                    
+                    if(x+1 < board.width){ rightGem = board.allGems[x+1,y];}
+                    
+                    
                     if(leftGem!=null&&rightGem!=null){
                         if(leftGem.type == currentGem.type && rightGem.type == currentGem.type){
                             currentGem.isMatched = true;
@@ -96,15 +259,30 @@ public class MatchFinder : MonoBehaviour
                             currentMatches.Add(currentGem);
                             currentMatches.Add(leftGem);
                             currentMatches.Add(rightGem);
+                            if(currentGem.matchNumber==0){
+                                currentGem.matchNumber = matchNumber;
+                                leftGem.matchNumber = matchNumber;
+                                rightGem.matchNumber = matchNumber;
+                            }else {
+                                currentGem.matchNumber = leftGem.matchNumber;
+                                rightGem.matchNumber = leftGem.matchNumber;
+                            }
+                            
                         }
                     }
+                    CheckVerticalMatch(currentGem, x, y, matchNumber);
                 }
     }
 
-    private void CheckVerticalMatch(Gem currentGem, int x, int y){
-                if(currentGem!=null&&y>0&&y<board.height-1){
-                    Gem downGem = board.allGems[x,y-1];
-                    Gem upGem = board.allGems[x,y+1];
+    private void CheckVerticalMatch(Gem currentGem, int x, int y, int matchNumber){
+                Gem downGem = null;
+                Gem upGem = null;
+                if(currentGem!=null&&y<board.height){
+                    if(y-1>=0){downGem = board.allGems[x,y-1];}
+                    
+                    if(y+1 < board.height){ upGem = board.allGems[x,y+1];}
+                    
+                    
                     if(upGem!=null&&downGem!=null){
                         if(upGem.type == currentGem.type && downGem.type == currentGem.type){
                             currentGem.isMatched = true;
@@ -113,6 +291,14 @@ public class MatchFinder : MonoBehaviour
                             currentMatches.Add(currentGem);
                             currentMatches.Add(upGem);
                             currentMatches.Add(downGem);
+                            if(currentGem.matchNumber==0){
+                                currentGem.matchNumber = matchNumber;
+                                upGem.matchNumber = matchNumber;
+                                downGem.matchNumber = matchNumber;
+                            }else {
+                                currentGem.matchNumber = downGem.matchNumber;
+                                upGem.matchNumber = downGem.matchNumber;
+                            }
                         }
                     }
                 }
@@ -120,17 +306,20 @@ public class MatchFinder : MonoBehaviour
         //now with two different lists for matched gems and bombed gems i can loop through current matches and count how many of a match there is and then 
         //destroy them, then wait a little and start counting how many were matched for the next set and destroy those. will also be able to use the matchLength
         //variable to determine unique actions depending on how many of a gem type were matched at once
-   public   IEnumerator DestroyMatches(){
-        if(currentMatches.Count!=0){
-            Gem control = currentMatches[0];
-            for(int i = 0; i<currentMatches.Count; i++){
-                if(currentMatches[i].type == control.type){
+    public IEnumerator DestroyMatches(){
+            
+            if(currentMatches.Count!=0){
+                int matchNumber = currentMatches[0].matchNumber;
+            for(int i = 0; i < currentMatches.Count; i++){
+                if(currentMatches[i].matchNumber == matchNumber){
                     DestroyMatchedGemAt(currentMatches[i].posIndex);
                 }
-                if(currentMatches[i].type != control.type){
-                    control = currentMatches[i];
+                if(currentMatches[i].matchNumber != matchNumber){
+                    
+                    matchNumber = currentMatches[i].matchNumber;
                     yield return new WaitForSeconds(1f);
                     DestroyMatchedGemAt(currentMatches[i].posIndex);
+                    
                 }
             }
         }
@@ -170,6 +359,7 @@ public class MatchFinder : MonoBehaviour
 
     private IEnumerator DecreaseRowCo(){
         yield return new WaitForSeconds(.2f);
+        //board.currentState = Board.BoardState.check;
 
         MoveGemsDownAfterDestruction();
         StartCoroutine (FillBoardCo());

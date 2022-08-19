@@ -12,7 +12,7 @@ public class Board : MonoBehaviour
     public Gem[] gems;
     public Gem[,] allGems;
     public MatchFinder matchFind;
-    public enum BoardState { wait, move};
+    public enum BoardState { wait, move, check, destroy};
     public BoardState currentState = BoardState.move;
     public Gem bomb;
     public float bombChance = 2f;
@@ -76,11 +76,15 @@ public class Board : MonoBehaviour
     public IEnumerator SmoothLerp(float waitTime,Gem gemStartPosition, Vector2 posTarget){
         float elapsedTime =0;
         while(elapsedTime<waitTime){
+            if(gemStartPosition !=null){
             gemStartPosition.transform.position = Vector3.Lerp(gemStartPosition.transform.position, posTarget, (elapsedTime/waitTime));
+            }
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+        if(gemStartPosition !=null){
         gemStartPosition.transform.position = posTarget;
+        }
         yield return null;
         
     }
