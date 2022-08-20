@@ -12,17 +12,19 @@ public class Board : MonoBehaviour
     public Gem[] gems;
     public Gem[,] allGems;
     public MatchFinder matchFind;
-    public enum BoardState { wait, move};
-    public BoardState currentState = BoardState.move;
+    public enum BoardState { playerTurn, checking, collapsing, filling};
+    public BoardState currentState;
     public Gem bomb;
     public float bombChance = 2f;
     public RoundManager roundMan;
+    public BoardStateManager stateManager;
 
     private void Awake(){
         matchFind = FindObjectOfType<MatchFinder>();
     }
     void Start()
     {
+         currentState = BoardState.playerTurn;
         allGems = new Gem[width,height];
         SetUp();
         roundMan = FindObjectOfType<RoundManager>();
@@ -30,7 +32,7 @@ public class Board : MonoBehaviour
 
     private void Update(){
 
-       // matchFind.FindAllMatches();
+       
        if(Input.GetKeyDown(KeyCode.S)){
         ShuffleBoard();
        }
@@ -74,6 +76,8 @@ public class Board : MonoBehaviour
     }
 
     public IEnumerator SmoothLerp(float waitTime,Gem gemStartPosition, Vector2 posTarget){
+        if(gemStartPosition != null){
+            
         float elapsedTime =0;
         while(elapsedTime<waitTime){
             gemStartPosition.transform.position = Vector3.Lerp(gemStartPosition.transform.position, posTarget, (elapsedTime/waitTime));
@@ -82,6 +86,7 @@ public class Board : MonoBehaviour
         }
         gemStartPosition.transform.position = posTarget;
         yield return null;
+        }
         
     }
 
@@ -103,8 +108,8 @@ public class Board : MonoBehaviour
     }
 
     public void ShuffleBoard(){
-        if(currentState != BoardState.wait){
-            currentState = BoardState.wait;
+        if(currentState != BoardState.checking){
+            currentState = BoardState.checking;
             List<Gem> gemsOnBoard = new List<Gem>();
 
             for(int x = 0; x<width; x++){

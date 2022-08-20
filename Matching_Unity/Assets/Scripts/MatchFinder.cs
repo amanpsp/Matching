@@ -26,8 +26,10 @@ public class MatchFinder : MonoBehaviour
         }
         if(currentMatches.Count > 0){
             currentMatches = currentMatches.Distinct().ToList();
-        }
-        CheckForBombs();
+            CheckForBombs();
+        StartCoroutine(DestroyMatches());
+        }else{board.currentState = Board.BoardState.playerTurn;}
+        
     }
 
     public void CheckForBombs(){
@@ -121,6 +123,7 @@ public class MatchFinder : MonoBehaviour
         //destroy them, then wait a little and start counting how many were matched for the next set and destroy those. will also be able to use the matchLength
         //variable to determine unique actions depending on how many of a gem type were matched at once
    public   IEnumerator DestroyMatches(){
+    if(currentMatches.Count>0){
         Gem control = currentMatches[0];
         for(int i = 0; i<currentMatches.Count; i++){
             if(currentMatches[i].type == control.type){
@@ -139,7 +142,8 @@ public class MatchFinder : MonoBehaviour
         bombMarks.Clear();
         }
         currentMatches.Clear();
-         StartCoroutine(DecreaseRowCo());
+        StartCoroutine(DecreaseRowCo());
+    }
     }
 
     /* private void StartSequentialDestroy(int matchLength, int currentMatchesPosition){
@@ -164,12 +168,19 @@ public class MatchFinder : MonoBehaviour
             }
         }
     } */
-
+    
     private IEnumerator DecreaseRowCo(){
         yield return new WaitForSeconds(.2f);
 
         MoveGemsDownAfterDestruction();
-        StartCoroutine (FillBoardCo());
+        //StartCoroutine (FillBoardCo());
+
+        yield return new WaitForSeconds(.5f);
+        RefillBoard();
+        yield return new WaitForSeconds(.5f);
+        FindAllMatches();
+        yield return new WaitForSeconds(.5f);
+        board.currentState = Board.BoardState.playerTurn;
         
         
     }
@@ -213,6 +224,7 @@ public class MatchFinder : MonoBehaviour
         }
     }
 
+    
     public IEnumerator FillBoardCo(){
         yield return new WaitForSeconds(.5f);
         RefillBoard();
@@ -221,13 +233,13 @@ public class MatchFinder : MonoBehaviour
 
         FindAllMatches();
 
-        if(currentMatches.Count > 0){
-            yield return new WaitForSeconds(1.5f);
-            DestroyMatches();
-        }else{
+        // if(currentMatches.Count > 0){
+        //     yield return new WaitForSeconds(1.5f);
+        //     DestroyMatches();
+        // }else{
         yield return new WaitForSeconds(.5f);
-        board.currentState = Board.BoardState.move;
-        }
+        board.currentState = Board.BoardState.playerTurn;
+        //}
     }
 
     private void RefillBoard(){

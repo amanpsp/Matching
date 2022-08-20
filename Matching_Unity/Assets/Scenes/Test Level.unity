@@ -910,6 +910,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1072597462}
   - component: {fileID: 1072597461}
+  - component: {fileID: 1072597463}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -943,6 +944,7 @@ MonoBehaviour:
   bomb: {fileID: 3494867611508346401, guid: 3823673a1c6890c4f890478405ddd350, type: 3}
   bombChance: 2
   roundMan: {fileID: 0}
+  stateManager: {fileID: 0}
 --- !u!4 &1072597462
 Transform:
   m_ObjectHideFlags: 0
@@ -958,8 +960,22 @@ Transform:
   - {fileID: 311800134}
   - {fileID: 2017618690}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1072597463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072597460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b64f23d391d32ab4f8159c11f049df12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiMan: {fileID: 0}
+  board: {fileID: 0}
 --- !u!1 &1112896086
 GameObject:
   m_ObjectHideFlags: 0
@@ -1370,7 +1386,7 @@ RectTransform:
   - {fileID: 737100654}
   - {fileID: 1112896087}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1390,6 +1406,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeText: {fileID: 0}
+  somethingText: {fileID: 0}
   roundOverScreen: {fileID: 0}
 --- !u!1 &1636081026
 GameObject:
@@ -1455,7 +1472,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1772933677
 GameObject:
@@ -1634,7 +1651,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2012909058
 GameObject:

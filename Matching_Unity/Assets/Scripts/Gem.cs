@@ -45,7 +45,7 @@ public class Gem : MonoBehaviour
     }
 
     void OnMouseDown(){
-        if(board.currentState == Board.BoardState.move && board.roundMan.roundTime > 0){
+        if(board.currentState == Board.BoardState.playerTurn && board.roundMan.roundTime > 0){
         isMouseGem = true;
         originalGemPos = posIndex;
         originalGemVectorPos = this.transform.position;
@@ -55,7 +55,7 @@ public class Gem : MonoBehaviour
     }
 
     void OnMouseDrag(){
-        if(board.currentState == Board.BoardState.move){
+        if(board.currentState == Board.BoardState.playerTurn && board.roundMan.roundTime > 0){
         Vector3 currentScreenPoint = new Vector3(Input.mousePosition.x,Input.mousePosition.y);
         Vector3 currentPosition = (Camera.main.ScreenToWorldPoint(currentScreenPoint)+offSet);
         transform.position = currentPosition;
@@ -63,13 +63,16 @@ public class Gem : MonoBehaviour
     }
 
     void OnMouseUp(){
-        if(board.currentState == Board.BoardState.move){
+        if(board.currentState == Board.BoardState.playerTurn){
         isMouseGem = false;
         transform.position = originalGemVectorPos;
-        board.currentState = Board.BoardState.wait;
+        board.currentState = Board.BoardState.checking;
         board.matchFind.FindAllMatches();
         //board.matchFind.DestroyMatches();
-        StartCoroutine(board.matchFind.DestroyMatches());
+        //StartCoroutine(board.matchFind.DestroyMatches());
+        } else{
+            isMouseGem = false;
+            transform.position = originalGemVectorPos;
         }
     }
 

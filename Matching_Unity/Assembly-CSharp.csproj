@@ -37,10 +37,18 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Gem.cs" />
+     <Compile Include="Assets\Scripts\RoundManager.cs" />
+     <Compile Include="Assets\Scripts\UIManager.cs" />
      <Compile Include="Assets\Scripts\Board.cs" />
      <Compile Include="Assets\Scripts\MatchFinder.cs" />
-     <Compile Include="Assets\Scripts\UIManager.cs" />
-     <Compile Include="Assets\Scripts\RoundManager.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\BaseState.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\StateMachine.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\BoardStateManager.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\PlayerTurn.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\CheckingForMatches.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\DestroyingMatches.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\FillingBoard.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\EnemyTurn.cs" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />

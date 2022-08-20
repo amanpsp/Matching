@@ -29,7 +29,7 @@ public class RoundManager : MonoBehaviour
             }
         }
 
-        if(endingRound && board.currentState == Board.BoardState.move){
+        if(endingRound && board.currentState == Board.BoardState.playerTurn){
             WinCheck();
         }
 
