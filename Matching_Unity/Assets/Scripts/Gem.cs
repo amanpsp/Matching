@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Gem : MonoBehaviour
 {
-
+    public int matchGroup;
     public bool isMouseGem;
     private Vector3 offSet;
     //[HideInInspector]
@@ -21,7 +21,7 @@ public class Gem : MonoBehaviour
     public Board board;
     public GameObject destroyEffect;
 
-    public enum GemType { blue, green, red, yellow, purple, bomb};
+    public enum GemType { blue=0, green=1, red=2, yellow=3, purple=4, bomb=5};
     public GemType type;
     public bool isMatched;
     public int blastSize = 1;
@@ -29,6 +29,7 @@ public class Gem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        matchGroup = 0;
         originalGemVectorPos = new Vector3(posIndex.x, posIndex.y);//this.gameObject.GetComponent<Transform>().position;
     }
 
@@ -45,31 +46,43 @@ public class Gem : MonoBehaviour
     }
 
     void OnMouseDown(){
-        if(board.currentState == Board.BoardState.playerTurn && board.roundMan.roundTime > 0){
+        /* if(board.currentState == Board.BoardState.playerTurn && board.roundMan.roundTime > 0){
         isMouseGem = true;
         originalGemPos = posIndex;
         originalGemVectorPos = this.transform.position;
         offSet = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x,Input.mousePosition.y));
         transform.position = (Camera.main.ScreenToWorldPoint(Input.mousePosition)+offSet);
+        } */
+        if(board.stateManager.CheckCurrentState().name == "PlayerTurn" && board.roundMan.roundTime > 0){
+            isMouseGem = true;
+            originalGemPos = posIndex;
+            originalGemVectorPos = this.transform.position;
+            offSet = gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x,Input.mousePosition.y));
+            transform.position = (Camera.main.ScreenToWorldPoint(Input.mousePosition)+offSet);
         }
     }
 
     void OnMouseDrag(){
-        if(board.currentState == Board.BoardState.playerTurn && board.roundMan.roundTime > 0){
+        if(board.stateManager.CheckCurrentState()==board.stateManager.playerTurnState &&board.roundMan.roundTime > 0){//currentState == Board.BoardState.playerTurn && board.roundMan.roundTime > 0){
         Vector3 currentScreenPoint = new Vector3(Input.mousePosition.x,Input.mousePosition.y);
         Vector3 currentPosition = (Camera.main.ScreenToWorldPoint(currentScreenPoint)+offSet);
         transform.position = currentPosition;
+        
         }
     }
 
     void OnMouseUp(){
-        if(board.currentState == Board.BoardState.playerTurn){
+        if(board.stateManager.CheckCurrentState() == board.stateManager.playerTurnState){
         isMouseGem = false;
-        transform.position = originalGemVectorPos;
-        board.currentState = Board.BoardState.checking;
-        board.matchFind.FindAllMatches();
-        //board.matchFind.DestroyMatches();
-        //StartCoroutine(board.matchFind.DestroyMatches());
+
+        originalGemVectorPos.x = posIndex.x;
+        originalGemVectorPos.y = posIndex.y;
+        transform.position = originalGemVectorPos;//this was the original line
+        
+
+        
+        board.stateManager.ChangeState(board.stateManager.checkingState);
+        
         } else{
             isMouseGem = false;
             transform.position = originalGemVectorPos;

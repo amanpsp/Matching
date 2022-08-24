@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class EnemyTurn : BaseState
 {
-    public EnemyTurn(BoardStateManager stateManager) : base("EnemyTurn",stateManager){
+    public EnemyTurn(BoardStateManager stateManager) : base("Enemy Turn State",stateManager){
 
     }
 
     public override void Enter(){
         base.Enter();
+        //no enemy yet so just gonna change to player turn state
+        stateManager.ChangeState(stateManager.playerTurnState);
         
     }
     public override void UpdateLogic(){

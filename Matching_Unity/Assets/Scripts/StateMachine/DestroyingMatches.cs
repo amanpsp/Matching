@@ -10,6 +10,10 @@ public class DestroyingMatches : BaseState
 
     public override void Enter(){
         base.Enter();
+        stateManager.uiMan.somethingText.text = "Destroying Matches";
+        //stateManager.board.matchFind.StartDestroyMatches();
+        stateManager.board.matchFind.DestroyCurrentMatches();
+        
         
     }
     public override void UpdateLogic(){

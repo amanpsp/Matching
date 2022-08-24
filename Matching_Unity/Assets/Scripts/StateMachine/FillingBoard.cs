@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class FillingBoard : BaseState
 {
-    public FillingBoard(BoardStateManager stateManager) : base("FillingBoard",stateManager){
+    public FillingBoard(BoardStateManager stateManager) : base("Board Filling State",stateManager){
 
     }
 
     public override void Enter(){
         base.Enter();
+        stateManager.uiMan.somethingText.text = "Board Filling State";
+        stateManager.board.matchFind.StartFillingTheBoard();
         
     }
     public override void UpdateLogic(){

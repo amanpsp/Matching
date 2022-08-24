@@ -10,7 +10,11 @@ public class CheckingForMatches : BaseState
 
     public override void Enter(){
         base.Enter();
+        stateManager.uiMan.somethingText.text = "Checking For Matches";
         //i think this is where i will call the method for checking for matches and to changeState to destroy or player turn of there are matches or not respectively
+
+        stateManager.board.matchFind.FindAllMatches();
+    
     }
     public override void UpdateLogic(){
         base.UpdateLogic();

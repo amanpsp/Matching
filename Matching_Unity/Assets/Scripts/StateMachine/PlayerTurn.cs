@@ -5,15 +5,15 @@ using TMPro;
 
 public class PlayerTurn : BaseState
 {
-    //public UIManager stateUiMan;
+    
     public PlayerTurn(BoardStateManager stateManager) : base("PlayerTurn", stateManager){
-        //stateUiMan = uiMan;
+        
     }
 
     public override void Enter(){
         base.Enter();//
         //playerTurn i dont think will do anything and will for now act as an idle state until the player does something to change the state like OnMouseUp
-        TextMeshProUGUI testSomething = stateManager.uiMan.somethingText;
+        //TextMeshProUGUI testSomething = stateManager.uiMan.somethingText;
         stateManager.uiMan.somethingText.text = "Player Turn";
         //stateUiMan.somethingText.text = "PlayerTurn";
         

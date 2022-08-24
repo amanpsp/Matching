@@ -13,6 +13,35 @@ public class MatchFinder : MonoBehaviour
         board = FindObjectOfType<Board>();
     } //Awake() gets called anytime an object is activated, better than start() here as awake() is called before start()
 
+    public void DestroyCurrentMatches(){
+        currentMatches = currentMatches.OrderBy(x => (int) x.type).ToList();
+        int group = 1;
+        for(int x = 0; x<currentMatches.Count; x++){
+            if(currentMatches[x]!=null){
+                RecursiveFloodDestroy(currentMatches[x].posIndex.x, currentMatches[x].posIndex.y, currentMatches[x].type,group);
+            }
+            group++;
+        }
+        currentMatches = currentMatches.OrderBy(x => x.matchGroup).ToList();
+        //StartDestroyMatches();
+        StartCoroutine(DestroyMatches());
+    }
+
+    public void RecursiveFloodDestroy(int x, int y, Gem.GemType gemType, int group){
+        if(x < 0 || x >= board.width || y<0 || y>=board.height || board.allGems[x,y].matchGroup!=0){
+            return;
+        }
+        if(x >=0 && x < board.width && y>=0 && y<board.height && board.allGems[x,y].type == gemType && board.allGems[x,y].isMatched == true){
+            board.allGems[x,y].matchGroup = group;
+            RecursiveFloodDestroy(x+1,y,gemType,group);//right
+            RecursiveFloodDestroy(x-1,y,gemType,group);//left
+            RecursiveFloodDestroy(x,y+1,gemType,group);//up
+            RecursiveFloodDestroy(x,y-1,gemType,group);//down 
+        }
+        
+    }
+
+
     public void FindAllMatches(){
         
         for( int x=0; x<board.width;x++)
@@ -26,11 +55,49 @@ public class MatchFinder : MonoBehaviour
         }
         if(currentMatches.Count > 0){
             currentMatches = currentMatches.Distinct().ToList();
+            //currentMatches = currentMatches.OrderBy(x => (int) x.type).ToList();
             CheckForBombs();
-        StartCoroutine(DestroyMatches());
-        }else{board.currentState = Board.BoardState.playerTurn;}
+            board.stateManager.ChangeState(board.stateManager.destroyingState);
+        }else{
+            board.stateManager.ChangeState(board.stateManager.enemyTurnState);
+            }
         
     }
+
+    private void CheckHorizontalMatch(Gem currentGem, int x, int y){
+                if(currentGem!=null&&x>0&&x<board.width-1){
+                    Gem leftGem = board.allGems[x-1,y];
+                    Gem rightGem = board.allGems[x+1,y];
+                    if(leftGem!=null&&rightGem!=null){
+                        if(leftGem.type == currentGem.type && rightGem.type == currentGem.type){
+                            currentGem.isMatched = true;
+                            leftGem.isMatched = true;
+                            rightGem.isMatched = true; 
+                            currentMatches.Add(currentGem);
+                            currentMatches.Add(leftGem);
+                            currentMatches.Add(rightGem);
+                        }
+                    }
+                }
+    }
+
+    private void CheckVerticalMatch(Gem currentGem, int x, int y){
+                if(currentGem!=null&&y>0&&y<board.height-1){
+                    Gem downGem = board.allGems[x,y-1];
+                    Gem upGem = board.allGems[x,y+1];
+                    if(upGem!=null&&downGem!=null){
+                        if(upGem.type == currentGem.type && downGem.type == currentGem.type){
+                            currentGem.isMatched = true;
+                            upGem.isMatched = true;
+                            downGem.isMatched = true; 
+                            currentMatches.Add(currentGem);
+                            currentMatches.Add(upGem);
+                            currentMatches.Add(downGem);
+                        }
+                    }
+                }
+    }
+
 
     public void CheckForBombs(){
         for(int i = 0; i<currentMatches.Count; i++){
@@ -86,51 +153,29 @@ public class MatchFinder : MonoBehaviour
         bombMarks = bombMarks.Distinct().ToList();
     }
 
-    private void CheckHorizontalMatch(Gem currentGem, int x, int y){
-                if(currentGem!=null&&x>0&&x<board.width-1){
-                    Gem leftGem = board.allGems[x-1,y];
-                    Gem rightGem = board.allGems[x+1,y];
-                    if(leftGem!=null&&rightGem!=null){
-                        if(leftGem.type == currentGem.type && rightGem.type == currentGem.type){
-                            currentGem.isMatched = true;
-                            leftGem.isMatched = true;
-                            rightGem.isMatched = true; 
-                            currentMatches.Add(currentGem);
-                            currentMatches.Add(leftGem);
-                            currentMatches.Add(rightGem);
-                        }
-                    }
-                }
-    }
+    
 
-    private void CheckVerticalMatch(Gem currentGem, int x, int y){
-                if(currentGem!=null&&y>0&&y<board.height-1){
-                    Gem downGem = board.allGems[x,y-1];
-                    Gem upGem = board.allGems[x,y+1];
-                    if(upGem!=null&&downGem!=null){
-                        if(upGem.type == currentGem.type && downGem.type == currentGem.type){
-                            currentGem.isMatched = true;
-                            upGem.isMatched = true;
-                            downGem.isMatched = true; 
-                            currentMatches.Add(currentGem);
-                            currentMatches.Add(upGem);
-                            currentMatches.Add(downGem);
-                        }
-                    }
-                }
+    public void StartDestroyMatches(){
+        StartCoroutine(DestroyMatches());
+        //board.stateManager.ChangeState(board.stateManager.fillingBoardState);
     }
         //now with two different lists for matched gems and bombed gems i can loop through current matches and count how many of a match there is and then 
         //destroy them, then wait a little and start counting how many were matched for the next set and destroy those. will also be able to use the matchLength
         //variable to determine unique actions depending on how many of a gem type were matched at once
-   public   IEnumerator DestroyMatches(){
+   
+
+    public IEnumerator DestroyMatches(){
+        yield return new WaitForSeconds(.5f);
     if(currentMatches.Count>0){
-        Gem control = currentMatches[0];
+        //Gem control = currentMatches[0];
+        int group = 1;
         for(int i = 0; i<currentMatches.Count; i++){
-            if(currentMatches[i].type == control.type){
+            if(currentMatches[i].matchGroup == group){
                 DestroyMatchedGemAt(currentMatches[i].posIndex);
             }
-            if(currentMatches[i].type != control.type){
-                control = currentMatches[i];
+            if(currentMatches[i].matchGroup != group){
+                //control = currentMatches[i];
+                group = currentMatches[i].matchGroup;
                 yield return new WaitForSeconds(1f);
                 DestroyMatchedGemAt(currentMatches[i].posIndex);
             }
@@ -142,45 +187,23 @@ public class MatchFinder : MonoBehaviour
         bombMarks.Clear();
         }
         currentMatches.Clear();
+        board.stateManager.ChangeState(board.stateManager.fillingBoardState);
+    }
+    }
+    
+
+    public void StartFillingTheBoard(){
         StartCoroutine(DecreaseRowCo());
     }
-    }
-
-    /* private void StartSequentialDestroy(int matchLength, int currentMatchesPosition){
-        for(int i = 0; i<matchLength;i++){
-            if(currentMatches[i]!=null){
-            DestroyMatchedGemAt(currentMatches[i].posIndex);
-            } 
-        }
-        WaitingForTime(0f);
-
-    } */
-    /* private IEnumerator CoRoWait(float timeToWait, int i){
-        yield return new WaitForSeconds(timeToWait);
-        DestroyMatchedGemAt(currentMatches[i].posIndex);
-    } */
-
-    /* private void WaitingForTime(float time){
-        while(time>0){
-            time -= Time.deltaTime;
-            if(time <= 0){
-                time = 0;
-            }
-        }
-    } */
     
     private IEnumerator DecreaseRowCo(){
-        yield return new WaitForSeconds(.2f);
-
+        yield return new WaitForSeconds(.5f);
         MoveGemsDownAfterDestruction();
-        //StartCoroutine (FillBoardCo());
-
         yield return new WaitForSeconds(.5f);
         RefillBoard();
         yield return new WaitForSeconds(.5f);
         FindAllMatches();
-        yield return new WaitForSeconds(.5f);
-        board.currentState = Board.BoardState.playerTurn;
+        
         
         
     }
@@ -228,18 +251,10 @@ public class MatchFinder : MonoBehaviour
     public IEnumerator FillBoardCo(){
         yield return new WaitForSeconds(.5f);
         RefillBoard();
-
-        yield return new WaitForSeconds(.5f);
+        
+        yield return new WaitForSeconds(1f);
 
         FindAllMatches();
-
-        // if(currentMatches.Count > 0){
-        //     yield return new WaitForSeconds(1.5f);
-        //     DestroyMatches();
-        // }else{
-        yield return new WaitForSeconds(.5f);
-        board.currentState = Board.BoardState.playerTurn;
-        //}
     }
 
     private void RefillBoard(){
@@ -254,6 +269,8 @@ public class MatchFinder : MonoBehaviour
             }
         }
         CheckMisplacedGems();
+        
+        
     }
 
     private void CheckMisplacedGems(){
@@ -270,7 +287,30 @@ public class MatchFinder : MonoBehaviour
             Destroy(g.gameObject);
         }
 
-
     }
+
+
+    /* private void StartSequentialDestroy(int matchLength, int currentMatchesPosition){
+        for(int i = 0; i<matchLength;i++){
+            if(currentMatches[i]!=null){
+            DestroyMatchedGemAt(currentMatches[i].posIndex);
+            } 
+        }
+        WaitingForTime(0f);
+
+    } */
+    /* private IEnumerator CoRoWait(float timeToWait, int i){
+        yield return new WaitForSeconds(timeToWait);
+        DestroyMatchedGemAt(currentMatches[i].posIndex);
+    } */
+
+    /* private void WaitingForTime(float time){
+        while(time>0){
+            time -= Time.deltaTime;
+            if(time <= 0){
+                time = 0;
+            }
+        }
+    } */
 
 }

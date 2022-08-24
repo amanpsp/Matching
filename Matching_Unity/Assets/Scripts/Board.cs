@@ -13,7 +13,7 @@ public class Board : MonoBehaviour
     public Gem[,] allGems;
     public MatchFinder matchFind;
     public enum BoardState { playerTurn, checking, collapsing, filling};
-    public BoardState currentState;
+    //public BoardState currentState;
     public Gem bomb;
     public float bombChance = 2f;
     public RoundManager roundMan;
@@ -21,13 +21,16 @@ public class Board : MonoBehaviour
 
     private void Awake(){
         matchFind = FindObjectOfType<MatchFinder>();
+        roundMan = FindObjectOfType<RoundManager>();
+        stateManager = FindObjectOfType<BoardStateManager>();
     }
     void Start()
     {
-         currentState = BoardState.playerTurn;
+        //currentState = BoardState.playerTurn;
         allGems = new Gem[width,height];
         SetUp();
-        roundMan = FindObjectOfType<RoundManager>();
+        
+        stateManager.ChangeState(stateManager.playerTurnState);
     }
 
     private void Update(){
@@ -66,7 +69,7 @@ public class Board : MonoBehaviour
             gemToSpawn = bomb;
         }
         Gem gem = Instantiate(gemToSpawn, new Vector3(pos.x, pos.y + height, 0), Quaternion.identity);
-        StartCoroutine(SmoothLerp(1f,gem,pos));
+        StartCoroutine(SmoothLerp(.5f,gem,pos));
         gem.transform.parent = this.transform;
         //gem.transform.position = new Vector3(pos.x, pos.y,0);
         gem.name = gem.type + " Gem - "+ pos.x +"," + pos.y;
@@ -80,11 +83,15 @@ public class Board : MonoBehaviour
             
         float elapsedTime =0;
         while(elapsedTime<waitTime){
+           // if(gemStartPosition != null){
             gemStartPosition.transform.position = Vector3.Lerp(gemStartPosition.transform.position, posTarget, (elapsedTime/waitTime));
+            //}
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+        //if(gemStartPosition != null){
         gemStartPosition.transform.position = posTarget;
+        //}
         yield return null;
         }
         
@@ -107,12 +114,19 @@ public class Board : MonoBehaviour
 
     }
 
-    public void ShuffleBoard(){
-        if(currentState != BoardState.checking){
-            currentState = BoardState.checking;
-            List<Gem> gemsOnBoard = new List<Gem>();
+    public void StartShuffleBoard(){
+        if(stateManager.CheckCurrentState() == stateManager.playerTurnState){
+            stateManager.ChangeState(stateManager.playerActionState);
+            
 
-            for(int x = 0; x<width; x++){
+        }
+        ShuffleBoard(); 
+        //StartCoroutine(matchFind.FillBoardCo());
+    }
+
+    public void ShuffleBoard(){
+        List<Gem> gemsOnBoard = new List<Gem>();
+         for(int x = 0; x<width; x++){
                 for(int y = 0; y<height; y++){
                     gemsOnBoard.Add(allGems[x,y]);
                     allGems[x,y] = null;
@@ -134,10 +148,11 @@ public class Board : MonoBehaviour
                     gemsOnBoard.RemoveAt(gemToUse);
                 }
             }
-
-        } 
-        StartCoroutine(matchFind.FillBoardCo());
-    }
-
+        //StartCoroutine(matchFind.FillBoardCo());
+        stateManager.ChangeState(stateManager.checkingState);
+    } 
+       
+    
+    
 
 }
